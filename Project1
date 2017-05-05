@@ -1,0 +1,657 @@
+class ship{
+  
+private:
+    
+    
+    struct coordinate{
+        
+        int x;
+        
+        int y;
+        
+        int z;
+        
+    };
+    
+    struct Node{
+        
+        char var;
+        
+        string route;
+    };
+    
+    //map<coordinate, char> print;
+    
+    // data structure  3D - vector
+    vector<vector<vector<Node>>> ds;
+    
+    vector<char*>list;
+    
+    //string final_route;
+    
+    int starting_level;
+    
+    int starting_row;
+    
+    int starting_column;
+    
+    int final_l;
+    
+    int final_c;
+    
+    int final_r;
+    
+    int size;
+    
+    int level;
+    
+    // reading mode
+    char mode;
+    
+    //ostringstream op;
+    
+    // queue mmode
+    char om;
+    
+    char output;
+    
+    //coordinate *final;
+   
+    
+    
+public:
+    
+    // constructor
+    
+    ship(char om_in, char oin ): om(om_in), output(oin){
+        
+    cout << "constructor done" << endl; }
+    
+    
+    void read_in_data( string file ){
+        
+        ifstream iput(file);
+        
+        // check it is op&en
+        
+        if(!iput.is_open()){
+            
+            cout << "Error Opening " << endl;
+        }
+        // read in input data mode
+        iput >> mode;
+        
+        //cout << mode;
+        
+        // level
+        iput >> level;
+        
+        //cout << level;
+        // size
+        iput >> size;
+        
+        ds.resize(level,vector<vector<Node>>(size, vector<Node>(size)));
+        
+        if( mode == 'M'){
+            
+            string trash;
+            
+            getline(iput,trash);
+            
+           // cout << trash << endl;
+            
+            getline(iput,trash);
+            
+            //cout << trash << endl;
+            
+            for( int i = 0; i < level; ++ i ){
+                
+                // readin // level##
+                string trash2;
+                
+                getline(iput, trash2);
+                
+                //cout << trash2 << endl;
+                
+                for(int j = 0; j < size; ++j){
+                    
+                    for(int k = 0; k < size; ++k ){
+                        
+                        //Node *data = new Node;
+                        
+                        iput >> ds.at(i).at(j).at(k).var;
+                        
+                       // iput >> data->var;
+                        
+                        //cout << data->var << endl;
+                        // catch starting level
+                        if(ds.at(i).at(j).at(k).var == 'S'){
+                            
+                            starting_level = i;
+                            
+                            starting_row = j;
+                            
+                            starting_column = k;
+                            
+                        }
+                    
+                        
+                    }
+                    
+                }
+                // readin the final blank line
+                string trash3;
+                
+                getline(iput,trash3);
+                
+                //cout << trash3 << endl;
+                
+            }
+            
+        }
+        
+        else{
+            //cout << mode << "else "<< endl;
+            
+            
+            
+            for( int i = 0; i < level; ++i ){
+                
+                for(int j = 0; j < size; ++j){
+                    
+                    for( int k =0; k < size; ++k ){
+                        
+                      ds.at(i).at(j).at(k).var = '.'; 
+                        
+                    
+                        
+                    }
+                    
+                }
+            }
+        
+        
+        int level;
+        
+        int row;
+        
+        int column;
+        
+        char temp;
+            
+        string trash;
+            
+        getline(iput, trash);
+            
+        getline(iput, trash);
+            
+        string line;
+        
+        while( getline(iput, line) ){
+            
+           
+            
+            if(temp == 'S'){
+                
+                starting_level = level;
+                
+                starting_row = row;
+                
+                starting_column = column;
+                
+            }
+            
+           ds.at( line[1] - '0' ).at( line[3] - '0' ).at( line[5] - '0' ).var= line[7];
+            
+        }
+        
+    }
+    }
+    
+    
+    string find_path(){
+        
+        coordinate *first = new coordinate;
+        
+        first->x = starting_level;
+        
+        first->y = starting_row;
+        
+        //cout << "starting_row: " << first->y << endl;
+        
+        first->z = starting_column;
+        
+        deque<coordinate*>currents;
+        
+        deque<coordinate*>helper;
+        
+        currents.push_back(first);
+        
+        while( !currents.empty() ){
+        
+            coordinate* victum;
+            
+           
+                
+            victum = currents.front();
+            
+            
+            // check if it is 'H'
+            
+            if( ds.at(victum->x).at(victum->y).at(victum->z).var == 'H'){
+                
+                string get_route = ds.at(victum->x).at(victum->y).at(victum->z).route;
+                
+                final_l = victum->x;
+                
+                final_r = victum->y;
+                
+                final_c = victum->z;
+                //final_route = get_route;
+                
+                // clean !!!
+                while(!currents.empty()){
+                    
+                    delete currents.front();
+                    
+                    currents.pop_front();
+                    
+                }
+               
+                return get_route;
+                
+            }
+            
+            // check if it has north
+            // if it is in the row 0 != 0
+            // North is not '#'
+            // routh is empty
+            if( victum->y != 0  &&  ds.at(victum->x).at(victum->y - 1 ).at(victum->z).var!= '#'
+               &&  ds.at( victum->x).at(victum->y - 1).at(victum->z).route.empty()){
+              
+                ds.at(victum->x ).at(victum->y - 1).at(victum->z).route =
+                (ds.at(victum->x).at(victum->y).at(victum->z).route+ 'n');
+                
+                //cout << victum->x << victum->y << victum->z << endl;
+    
+                
+                coordinate *data = new coordinate;
+                
+                data->x = victum->x;
+                
+                data->y = victum->y - 1;
+                
+                data->z = victum->z;
+                
+                helper.push_back(data);
+                
+            }
+            // check east
+            if(victum->z != (size - 1) && ds.at(victum->x).at(victum->y).at(victum->z + 1).var != '#'
+               && ds.at(victum->x).at(victum->y).at(victum->z + 1).route.empty()){
+                
+                ds.at(victum->x).at(victum->y).at(victum->z + 1).route =
+                (ds.at(victum->x).at(victum->y).at(victum->z).route+ 'e');
+                
+               // cout << victum->x << victum->y << victum->z << endl;
+                
+                coordinate *data = new coordinate;
+                
+                data->x = victum->x;
+                
+                data->y = victum->y;
+                
+                data->z = victum->z + 1;
+                
+                //currents.push_back(data);
+                helper.push_back(data);
+
+                
+            }
+            // check south
+            if(victum->y != (size - 1) && ds.at(victum->x).at(victum->y + 1).at(victum->z).var != '#'
+               && ds.at(victum->x).at(victum->y + 1).at(victum->z).route.empty()){
+                
+                ds.at(victum->x).at(victum->y + 1).at(victum->z).route =
+                (ds.at(victum->x).at(victum->y).at(victum->z).route+ 's');
+                
+                coordinate *data = new coordinate;
+                
+                data->x = victum->x;
+                
+                data->y = victum->y + 1;
+                
+                data->z = victum->z;
+                
+                //currents.push_back(data);
+                
+                helper.push_back(data);
+
+                
+            }
+            
+            // check west
+            
+            if( victum->z != 0 && ds.at(victum->x).at(victum->y).at(victum->z - 1).var != '#'
+               && ds.at(victum->x).at(victum->y).at(victum->z - 1).route.empty()){
+                
+                ds.at(victum->x).at(victum->y).at(victum->z - 1).route =
+                (ds.at(victum->x).at(victum->y).at(victum->z).route+ 'w');
+                
+                
+                
+                coordinate *data = new coordinate;
+                
+                data->x = victum->x;
+                
+                data->y = victum->y;
+                
+                data->z = victum->z - 1;
+                
+                //currents.push_back(data);
+                
+                helper.push_back(data);
+
+                
+            }
+            
+            // check elevator
+            
+            if( ds.at(victum->x).at(victum->y).at(victum->z).var == 'E' ){
+                
+                
+                for( int i = 0; i < level; ++i ){
+                    
+                    // same position
+                    if( ds.at(i).at(victum->y).at(victum->z).var == 'E' && (i != victum->x )){
+                        
+                        
+                     char x = (char)(i + '0');
+                        
+                       ds.at(i).at(victum->y).at(victum->z).route =
+                        ds.at(victum->x).at(victum->y).at(victum->z).route + x ;
+                        
+                        coordinate *data = new coordinate;
+                        
+                        data->x = i;
+                        
+                        data->y = victum->y;
+                        
+                        data->z = victum->z;
+                        
+                        //currents.push_back(data);
+                        
+                        helper.push_back(data);
+
+                        
+                    }
+                    
+                }
+                
+            }
+            
+
+            if( om == 'q'){
+                
+                while(!helper.empty()){
+                    
+                    currents.push_back(helper.front());
+                    
+                    helper.pop_front();
+                    
+                }
+                //delete currents.front();
+                //currents.pop_front();
+                
+            }
+            
+            else{
+                
+                while( !helper.empty()){
+                    
+                    currents.push_back(helper.back());
+                    
+                    helper.pop_back();
+                    
+                }
+                
+                //cout << currents.back()->x << currents.back()->y << currents.back()->z << endl;
+                //delete currents.back();
+                //currents.pop_back();
+            }
+            
+            delete currents.front();
+            
+            currents.pop_front(); 
+            
+            
+        }// while loop
+        
+        string empty;
+        
+        //final_route = empty;
+        
+        return empty;
+    }
+    
+    
+    
+    
+    void change_grid( string route ){
+        
+        // change it into char
+        
+        if(route.empty()){
+            
+            cout << "empty" << endl; 
+            
+            return; 
+            
+        }
+        
+        //cout << "not empty" << endl;
+        
+        deque<char>final_route;
+        
+        const char* a = route.c_str();
+        
+        for( int i = 0; a[i] != '\0'; ++i){
+            
+            final_route.push_back(a[i]);
+            
+            
+        }
+        
+        // give it to starting point
+        
+        
+        coordinate track;
+        
+        track.x = starting_level;
+        
+        track.y = starting_row;
+        
+        track.z = starting_column;
+        
+        //final_route.pop_front();
+        
+        while( !final_route.empty() ){
+            
+            if(final_route.front() == 'n'){
+                
+                ds.at(track.x).at(track.y ).at(track.z).var = 'n';
+                
+                //print[track] = 'n';
+                
+                char* r = new char[4];
+                
+                r[0] = (char)(track.x + '0');
+                
+                r[1] = (char)(track.y + '0');
+                
+                r[2] = (char)(track.z + '0');
+                
+                r[3] = 'n';
+                
+                list.push_back(r);
+                
+                
+                
+                track.y --;
+                
+            }
+            
+            else if(final_route.front() == 'e'){
+                
+                ds.at(track.x).at(track.y).at(track.z).var = 'e';
+                
+                //print[track] = 'e';
+                
+                
+                char* r = new char[4];
+                
+                r[0] = (char)(track.x + '0');
+                
+                r[1] = (char)(track.y + '0');
+                
+                r[2] = (char)(track.z + '0');
+                
+                r[3] = 'e';
+                
+                list.push_back(r);
+                
+                track.z ++;
+                
+                
+            }
+            
+            else if(final_route.front() == 's'){
+                
+                ds.at(track.x).at(track.y).at(track.z).var ='s';
+                
+                //print[track] = 's';
+                
+                char* r = new char[4];
+                
+                r[0] = (char)(track.x + '0');
+                
+                r[1] = (char)(track.y + '0');
+                
+                r[2] = (char)(track.z + '0');
+                
+                r[3] = 's';
+                
+                list.push_back(r);
+                
+                track.y ++;
+                
+            }
+            
+            else if(final_route.front() == 'w'){
+                
+                ds.at(track.x).at(track.y).at(track.z).var ='w';
+                
+                
+                char* r = new char[4];
+                
+                r[0] = (char)(track.x + '0');
+                
+                r[1] = (char)(track.y + '0');
+                
+                r[2] = (char)(track.z + '0');
+                
+                r[3] = 'w';
+                
+                list.push_back(r);
+                
+                //print[track] = 'w';
+                
+                track.z --;
+                
+            }
+            else{
+                
+                ds.at(track.x).at(track.y).at(track.z).var = final_route.front();
+                
+                //print[track] = final_route.front();
+                
+                char* r = new char[4];
+                
+                r[0] = (char)(track.x + '0');
+                
+                r[1] = (char)(track.y + '0');
+                
+                r[2] = (char)(track.z + '0');
+                
+                r[3] = final_route.front();
+                
+                list.push_back(r);
+                
+                track.x = (final_route.front() - '0');
+               
+            }
+            
+                final_route.pop_front();
+            
+            
+            
+        }
+        
+    }
+    
+    
+    void print_out(){
+        
+        if( output =='M'){
+        
+            for(int i = 0; i < level; ++i){
+            
+            cout << "//level " << i << endl;
+           
+            for(int j = 0; j < size; ++j ){
+                
+                for(int k = 0; k < size; ++k ){
+                    
+                cout<< ds.at(i).at(j).at(k).var << " " ;
+                    
+                }
+                
+                cout<< endl;
+                
+            }
+            
+        }
+        
+        }
+        else{
+            
+            
+            for( int i = 0; i < list.size(); ++i ){
+                
+                cout <<"(" << list.at(i)[0] << "," << list.at(i)[1] << ","
+                << list.at(i)[2] << "," << list.at(i)[3] << ")" << endl;
+                
+                delete []list.at(i);
+                
+            }
+            
+             cout <<"(" << final_l << "," << final_r << ","
+            << final_c << ","<< 'H' << ")" << endl;
+            
+            
+        }
+        
+        
+        
+        
+    }
+    
+   
+    
+ 
+    
+    
+    
+};
+
+
